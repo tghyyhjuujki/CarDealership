@@ -1,0 +1,193 @@
+ @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`sales_person`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`sales_person` (
+  `sales_id` INT auto_increment,
+  `sales_name` VARCHAR(45) NULL,
+  `sales_phone`  VARCHAR(45) NULL,
+  PRIMARY KEY (`sales_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Car`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Car` (
+  `car_id` INT auto_increment,
+  `car_name` varchar(50),
+  `color` VARCHAR(45) NULL,
+  `made_by` VARCHAR(45) NULL,
+  `sales` varchar(50) default 'onSale',
+  PRIMARY KEY (`car_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Customer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Customer` (
+  `cust_id` INT auto_increment,
+  `cust_name` VARCHAR(45) NULL,
+  `cust_phone` VARCHAR(45) NULL,
+  `cust_birth` int NULL,
+  PRIMARY KEY (`cust_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Sales_invoice`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Sales_invoice` (
+  `invoice_number` INT auto_increment,
+  `sales_id` INT NOT NULL,
+  `cust_id` INT NOT NULL,
+  `car_id` INT NOT NULL,
+  PRIMARY KEY (`invoice_number`),
+  INDEX `fk_Sales_invoice_sales_person1_idx` (`sales_id` ASC) ,
+  INDEX `fk_Sales_invoice_Customer1_idx` (`cust_id` ASC) ,
+  INDEX `fk_Sales_invoice_Car1_idx` (`car_id` ASC) ,
+  CONSTRAINT `fk_Sales_invoice_sales_person1`
+    FOREIGN KEY (`sales_id`)
+    REFERENCES `mydb`.`sales_person` (`sales_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Sales_invoice_Customer1`
+    FOREIGN KEY (`cust_id`)
+    REFERENCES `mydb`.`Customer` (`cust_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Sales_invoice_Car1`
+    FOREIGN KEY (`car_id`)
+    REFERENCES `mydb`.`Car` (`car_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Service_ticket`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Service_ticket` (
+  `Service_ticket_id` INT auto_increment,
+  `price` VARCHAR(45) NULL,
+  `cust_id` INT NOT NULL,
+  `car_id` INT NOT NULL,
+  PRIMARY KEY (`Service_ticket_id`, `car_id`),
+  INDEX `fk_Service_ticket_Customer1_idx` (`cust_id` ASC) ,
+  INDEX `fk_Service_ticket_Car1_idx` (`car_id` ASC) ,
+  CONSTRAINT `fk_Service_ticket_Customer1`
+    FOREIGN KEY (`cust_id`)
+    REFERENCES `mydb`.`Customer` (`cust_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Service_ticket_Car1`
+    FOREIGN KEY (`car_id`)
+    REFERENCES `mydb`.`Car` (`car_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`mechanics`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`mechanics` (
+  `mechanic_id` varchar(45) not null,
+  `mechanic_name` VARCHAR(45) NULL,
+  `MON` VARCHAR(45) NULL,
+  `TUE` VARCHAR(45) NULL,
+  `WED` VARCHAR(45) NULL,
+  `THU` VARCHAR(45) NULL,
+  `FRI` VARCHAR(45) NULL,
+  PRIMARY KEY (`mechanic_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`part`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`part` (
+  `part_id` INT auto_increment,
+  PRIMARY KEY (`part_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Used_part`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Used_part` (
+  `used_part_id`int auto_increment,
+  `part_id` INT NOT NULL,
+  `Service_ticket_id` INT NOT NULL,
+  PRIMARY KEY (`used_part_id`, `part_id`, `Service_ticket_id`),
+  INDEX `fk_part_has_Service_ticket_Service_ticket1_idx` (`Service_ticket_id` ASC) ,
+  INDEX `fk_part_has_Service_ticket_part1_idx` (`part_id` ASC) ,
+  CONSTRAINT `fk_part_has_Service_ticket_part1`
+    FOREIGN KEY (`part_id`)
+    REFERENCES `mydb`.`part` (`part_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_part_has_Service_ticket_Service_ticket1`
+    FOREIGN KEY (`Service_ticket_id`)
+    REFERENCES `mydb`.`Service_ticket` (`Service_ticket_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`service`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`service` (
+  `service_id` INT auto_increment,
+  PRIMARY KEY (`service_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`mechanics_service`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`mechanics_service` (
+  `mechanics_service_id` int auto_increment,
+  `mechanic_id` varchar(45) not null,
+  `ticket_Service_ticket_id` INT NOT NULL,
+  `service_service_id` INT NOT NULL,
+  PRIMARY KEY (`mechanics_service_id`, `mechanic_id`, `ticket_Service_ticket_id`, `service_service_id`),
+  INDEX `fk_mechanics_has_Service_ticket_Service_ticket1_idx` (`ticket_Service_ticket_id` ASC) ,
+  INDEX `fk_mechanics_has_Service_ticket_mechanics1_idx` (`mechanic_id` ASC) ,
+  INDEX `fk_mechanics(1)_service1_idx` (`service_service_id` ASC) ,
+  CONSTRAINT `fk_mechanics_has_Service_ticket_mechanics1`
+    FOREIGN KEY (`mechanic_id`)
+    REFERENCES `mydb`.`mechanics` (`mechanic_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_mechanics_has_Service_ticket_Service_ticket1`
+    FOREIGN KEY (`ticket_Service_ticket_id`)
+    REFERENCES `mydb`.`Service_ticket` (`Service_ticket_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_mechanics(1)_service1`
+    FOREIGN KEY (`service_service_id`)
+    REFERENCES `mydb`.`service` (`service_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
