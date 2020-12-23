@@ -1,0 +1,15 @@
+version: "3"
+services:
+  mysql:
+    image: tghyyhju/mysql4:latest 
+    ports:
+      - "3306:3306" #포트번호
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true" # 비밀번호 무시
+    network_mode: "host"
+    restart: always
+ 
+  python:
+    image: tghyyhju/python2:latest
+    network_mode: "host"
+    command: tail -f
